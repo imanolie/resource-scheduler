@@ -13,7 +13,6 @@ public class GatewayImplementation implements Gateway {
         this.noOfResources = noOfResources;
     }
 
-    @Override
     public void send(Message msg) {
         this.process(msg);
     }
