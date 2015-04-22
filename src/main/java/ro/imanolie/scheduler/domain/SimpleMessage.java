@@ -13,6 +13,10 @@ public class SimpleMessage extends Message {
         this.message = message;
     }
 
+    public String getGroupId() {
+        return this.groupId;
+    }
+
     public void completed() {
         // TODO log
         System.out.println("Message: '" + this.message + "' with groupId: '" + this.groupId + "' was successfully processed.");

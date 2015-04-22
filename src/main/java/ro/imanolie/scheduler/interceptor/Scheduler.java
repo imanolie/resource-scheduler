@@ -4,8 +4,6 @@ import ro.imanolie.scheduler.domain.Message;
 import ro.imanolie.scheduler.gateway.Gateway;
 import ro.imanolie.scheduler.gateway.GatewayImplementation;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 /**
  * This class handles the way the messages are send to the 3rd party libraries for further processing.
  * His role is to schedule messages and not to flood the 3rd party resource, therefore a message will be send
@@ -18,7 +16,7 @@ public class Scheduler implements MessageCompleteObserver {
     private Gateway gateway;
 
     private int noOfAvailableResources;
-    private ConcurrentLinkedQueue<Message> msgQueue = new ConcurrentLinkedQueue<Message>();
+    private MessagePriorityQueue msgQueue = new MessagePriorityQueue();
 
     public Scheduler(int noOfResources) {
         this.noOfAvailableResources = noOfResources;
@@ -31,14 +29,12 @@ public class Scheduler implements MessageCompleteObserver {
     }
 
     private void schedule(Message msg) {
-        System.err.println(noOfAvailableResources + " schedule: " + Thread.currentThread().getName() + " " + msg.getContent());
+        msgQueue.add(msg);
+
         if(areResourcesAvailable()) {
-            System.err.println("schedule->sent: " + Thread.currentThread().getName() + " " + msg.getContent());
-            this.gateway.send(msg);
+            Message nextMsgToBeProcessed = this.msgQueue.poll();
+            this.gateway.send(nextMsgToBeProcessed);
             this.noOfAvailableResources--;
-        } else {
-            System.out.println("schedule->queued: " + Thread.currentThread().getName() + " " + msg.getContent());
-            msgQueue.add(msg);
         }
     }
 
@@ -46,10 +42,14 @@ public class Scheduler implements MessageCompleteObserver {
         return noOfAvailableResources > 0;
     }
 
+    /**
+     * As message completes, resources are freed therefore is any messages are waiting in queue they will be processed.
+     * @param msg - the completed message
+     */
     public void update(Message msg) {
         msg.completed();
+        this.noOfAvailableResources++;
         if(!this.msgQueue.isEmpty()) {
-            this.noOfAvailableResources++;
             this.schedule(this.msgQueue.poll());
         }
     }
