@@ -13,8 +13,6 @@ public abstract class Message {
      */
     public abstract void completed();
 
-    public abstract String getContent();
-
     public void setObserver(MessageCompleteObserver observer) {
         this.observer = observer;
     }

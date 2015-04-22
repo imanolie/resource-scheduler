@@ -1,9 +1,16 @@
 package ro.imanolie.scheduler.domain;
 
+import ro.imanolie.scheduler.logging.LogCode;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * @author imanolie on 12/21/2015.
  */
 public class SimpleMessage extends Message {
+
+    private final static Logger LOG = LogManager.getLogger(SimpleMessage.class.getName());
 
     protected String groupId;
     protected String message;
@@ -18,12 +25,11 @@ public class SimpleMessage extends Message {
     }
 
     public void completed() {
-        // TODO log
-        System.out.println("Message: '" + this.message + "' with groupId: '" + this.groupId + "' was successfully processed.");
+        LOG.info(LogCode.INFO_MSG_PROCESSING_SUCCESS, this);
     }
 
-    public String getContent() {
-        return this.groupId + "#" + this.message;
+    @Override
+    public String toString() {
+        return "SimpleMessage{" + "groupId='" + groupId + '\'' + ", message='" + message + '\'' + '}';
     }
-
 }

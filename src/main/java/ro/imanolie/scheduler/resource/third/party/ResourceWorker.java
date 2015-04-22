@@ -1,10 +1,14 @@
 package ro.imanolie.scheduler.resource.third.party;
 
 import ro.imanolie.scheduler.domain.Message;
+import ro.imanolie.scheduler.logging.LogCode;
 
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Thread implementation that mimics third party resource behaviour.
@@ -14,6 +18,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author imanolie on 4/22/2015.
  */
 public class ResourceWorker extends Thread {
+
+    private final static Logger LOG = LogManager.getLogger(ResourceWorker.class.getName());
 
     private Message msg;
     private Random random = new Random();
@@ -39,7 +45,7 @@ public class ResourceWorker extends Thread {
     }
 
     public void run() {
-        System.err.println("Run: " + this.getName() + " " + this.msg.getContent());
+        LOG.info(LogCode.INFO_STARTED_MSG_PROCESSING, this.msg);
         try {
             this.process();
         } finally {
@@ -52,8 +58,7 @@ public class ResourceWorker extends Thread {
         try {
             Thread.sleep(x * 100);
         } catch (InterruptedException e) {
-            // TODO log
-            e.printStackTrace();
+            LOG.error(LogCode.ERR_MSG_PROCESSING_EXCEPTION, e);
         }
     }
 }
