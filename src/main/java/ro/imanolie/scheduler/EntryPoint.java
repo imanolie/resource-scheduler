@@ -54,6 +54,6 @@ public class EntryPoint {
         scheduler.send(msg3);
         scheduler.send(msg4);
         scheduler.send(msg5);
-
+        scheduler.cancel("group3");
     }
 }

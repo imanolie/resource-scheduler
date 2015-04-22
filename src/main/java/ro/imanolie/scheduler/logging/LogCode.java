@@ -7,8 +7,9 @@ public class LogCode {
     public static final String INFO_APP_STARTED = "Application has started.";
     public static final String INFO_STARTED_MSG_PROCESSING = "Message '{}' is now processing.";
     public static final String INFO_MSG_PROCESSING_SUCCESS = "Message '{}' was successfully processed.";
-    public static final String INFO_MSG_RECEIVED = "Message '{}' was received for processing.";
+    public static final String INFO_MSG_RECEIVED = "Message '{}' was received.";
     public static final String INFO_MSG_SENT = "Message '{}' was sent for processing.";
+    public static final String INFO_GROUP_CANCELED = "Further messages from group: '{}' will no longer be processed.";
 
     public static final String DEBUG_MSG_ADDED_TO_QUEUE_TO_EXISTING_GROUP = "Message '{}' was queued under existing group: '{}'.";
     public static final String DEBUG_MSG_ADDED_TO_QUEUE_NEW_GROUP = "Message '{}' was queued under new group: '{}'.";

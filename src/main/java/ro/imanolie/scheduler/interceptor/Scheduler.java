@@ -1,9 +1,13 @@
 package ro.imanolie.scheduler.interceptor;
 
 import ro.imanolie.scheduler.domain.Message;
+import ro.imanolie.scheduler.domain.SimpleMessage;
 import ro.imanolie.scheduler.gateway.Gateway;
 import ro.imanolie.scheduler.gateway.GatewayImplementation;
 import ro.imanolie.scheduler.logging.LogCode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +26,7 @@ public class Scheduler implements MessageCompleteObserver {
 
     private int noOfAvailableResources;
     private MessagePriorityQueue msgQueue = new MessagePriorityQueue();
+    private List<String> ignoredGroups = new ArrayList<String>();
 
     public Scheduler(int noOfResources) {
         this.noOfAvailableResources = noOfResources;
@@ -29,18 +34,32 @@ public class Scheduler implements MessageCompleteObserver {
     }
 
     public void send(Message msg) {
+        this.msgQueue.add(msg);
         LOG.info(LogCode.INFO_MSG_RECEIVED, msg);
         msg.setObserver(this);
-        schedule(msg);
+        schedule();
     }
 
-    private void schedule(Message msg) {
-        msgQueue.add(msg);
+    public void cancel(String group) {
+        this.ignoredGroups.add(group);
+        LOG.info(LogCode.INFO_GROUP_CANCELED, group);
+    }
 
-        if(areResourcesAvailable()) {
+    /**
+     * If resources are available next message from queue will be sent for processing.
+     * If next message is black listed, the process will repeat until a message is can be processed.
+     */
+    private void schedule() {
+        if (areResourcesAvailable()) {
             Message nextMsgToBeProcessed = this.msgQueue.poll();
-            this.gateway.send(nextMsgToBeProcessed);
-            this.noOfAvailableResources--;
+            SimpleMessage _msg = (SimpleMessage) nextMsgToBeProcessed;
+
+            if(this.ignoredGroups.contains(_msg.getGroupId())) {
+                schedule();
+            } else {
+                this.gateway.send(nextMsgToBeProcessed);
+                this.noOfAvailableResources--;
+            }
         }
     }
 
@@ -56,7 +75,7 @@ public class Scheduler implements MessageCompleteObserver {
         msg.completed();
         this.noOfAvailableResources++;
         if(!this.msgQueue.isEmpty()) {
-            this.schedule(this.msgQueue.poll());
+            this.schedule();
         }
     }
 }
