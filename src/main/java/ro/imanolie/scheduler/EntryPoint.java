@@ -11,14 +11,15 @@ import ro.imanolie.scheduler.util.PropertyKeys;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author imanolie on 4/21/2015.
  */
 public class EntryPoint {
 
-    private final static Logger LOG = Logger.getLogger(EntryPoint.class);
+    private final static Logger LOG = LogManager.getLogger(EntryPoint.class.getName());
 
     public static void main(String[] args) throws IOException {
         LOG.info(LogCode.INFO_APP_STARTED);
@@ -36,6 +37,7 @@ public class EntryPoint {
 
     public static void validateArgs(String[] args) throws ApplicationInitializationException {
         if (args.length != 1) {
+            LOG.error(LogCode.ERR_INVALID_ARGS);
             throw new ApplicationInitializationException(LogCode.ERR_INVALID_ARGS);
         }
     }

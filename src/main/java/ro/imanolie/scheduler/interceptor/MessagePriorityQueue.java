@@ -2,10 +2,14 @@ package ro.imanolie.scheduler.interceptor;
 
 import ro.imanolie.scheduler.domain.Message;
 import ro.imanolie.scheduler.domain.SimpleMessage;
+import ro.imanolie.scheduler.logging.LogCode;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Wrapper over ConcurrentLinkedQueue class that has a custom priority algorithm as described below.
@@ -17,6 +21,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author imanolie on 4/22/2015.
  */
 public class MessagePriorityQueue {
+
+    private final static Logger LOG = LogManager.getLogger(MessagePriorityQueue.class.getName());
+
     /**
      * This field will hold the number of different groups of messages that need to be processed.
      */
@@ -51,12 +58,14 @@ public class MessagePriorityQueue {
         String groupId = msg.getGroupId();
         if(this.queueMap.containsKey(groupId)) {
             this.queueMap.get(groupId).add(msg);
+            LOG.debug(LogCode.DEBUG_MSG_ADDED_TO_QUEUE_TO_EXISTING_GROUP, msg, groupId);
         } else {
             ConcurrentLinkedQueue<SimpleMessage> msgQueue = new ConcurrentLinkedQueue<SimpleMessage>();
             msgQueue.add(msg);
             this.queueMap.put(groupId, msgQueue);
             this.priorityCounter++;
             this.groupPriorities.put(this.priorityCounter, groupId);
+            LOG.debug(LogCode.DEBUG_MSG_ADDED_TO_QUEUE_NEW_GROUP, msg, groupId);
         }
     }
 
@@ -79,6 +88,8 @@ public class MessagePriorityQueue {
         if(!priorityMessages.isEmpty()) {
             response = priorityMessages.poll();
         }
+
+        LOG.debug(LogCode.DEBUG_MSG_POLLED_FROM_QUEUE, response);
 
         return response;
     }

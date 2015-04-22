@@ -3,6 +3,10 @@ package ro.imanolie.scheduler.interceptor;
 import ro.imanolie.scheduler.domain.Message;
 import ro.imanolie.scheduler.gateway.Gateway;
 import ro.imanolie.scheduler.gateway.GatewayImplementation;
+import ro.imanolie.scheduler.logging.LogCode;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class handles the way the messages are send to the 3rd party libraries for further processing.
@@ -12,6 +16,7 @@ import ro.imanolie.scheduler.gateway.GatewayImplementation;
  * @author imanolie on 4/21/2015.
  */
 public class Scheduler implements MessageCompleteObserver {
+    private final static Logger LOG = LogManager.getLogger(Scheduler.class.getName());
 
     private Gateway gateway;
 
@@ -24,6 +29,7 @@ public class Scheduler implements MessageCompleteObserver {
     }
 
     public void send(Message msg) {
+        LOG.info(LogCode.INFO_MSG_RECEIVED, msg);
         msg.setObserver(this);
         schedule(msg);
     }
