@@ -4,19 +4,24 @@ import ro.imanolie.scheduler.domain.Message;
 import ro.imanolie.scheduler.domain.SimpleMessage;
 import ro.imanolie.scheduler.exception.ApplicationInitializationException;
 import ro.imanolie.scheduler.interceptor.Scheduler;
-import ro.imanolie.scheduler.resource.third.party.ResourceWorker;
+import ro.imanolie.scheduler.logging.LogCode;
 import ro.imanolie.scheduler.util.PropertiesLoader;
 import ro.imanolie.scheduler.util.PropertyKeys;
 
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author imanolie on 4/21/2015.
  */
 public class EntryPoint {
-    public static void main(String[] args) throws IOException {
 
+    private final static Logger LOG = Logger.getLogger(EntryPoint.class);
+
+    public static void main(String[] args) throws IOException {
+        LOG.info(LogCode.INFO_APP_STARTED);
         try {
             validateArgs(args);
             Properties properties = PropertiesLoader.load(args[0]);
@@ -24,14 +29,14 @@ public class EntryPoint {
             Scheduler scheduler = new Scheduler(noOfResources);
             sendBulk(scheduler);
         } catch (ApplicationInitializationException e) {
-            System.out.println(e.getMessage());
+            LOG.error(e.getMessage(), e);
             System.exit(-1);
         }
     }
 
     public static void validateArgs(String[] args) throws ApplicationInitializationException {
         if (args.length != 1) {
-            throw new ApplicationInitializationException("You must specify the application properties file path.");
+            throw new ApplicationInitializationException(LogCode.ERR_INVALID_ARGS);
         }
     }
 
