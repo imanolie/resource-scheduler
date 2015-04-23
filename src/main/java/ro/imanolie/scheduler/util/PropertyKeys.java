@@ -5,4 +5,5 @@ package ro.imanolie.scheduler.util;
  */
 public class PropertyKeys {
     public static final String KEY_NO_OF_RESOURCES = "resources.no";
+    public static final String KEY_LOGGING_FILE_PATH = "logging.file.path";
 }

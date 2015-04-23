@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
 
 /**
  * @author imanolie on 4/21/2015.
@@ -26,6 +27,9 @@ public class PropertiesLoader {
         try {
             InputStream inputStream = new FileInputStream(new File(filePath));
             properties.load(inputStream);
+            System.setProperty(PropertyKeys.KEY_LOGGING_FILE_PATH,
+                    properties.getProperty(PropertyKeys.KEY_LOGGING_FILE_PATH));
+            ((LoggerContext) LogManager.getContext(false)).reconfigure();
         } catch (FileNotFoundException e) {
             LOG.error(LogCode.ERR_FILE_NOT_FOUND, filePath);
             throw new ApplicationInitializationException(LogCode.ERR_FILE_NOT_FOUND);
