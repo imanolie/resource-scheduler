@@ -1,0 +1,39 @@
+			Resourse Scheduler POC
+
+Design approach:
+	- maven project: As I found maven projects easy to work with I've choosed to implement it
+in this project. The main reasons are easy dependency management and at hand build process 
+that maven provides.
+	- external application configuration file: a configuration file must be provided in order
+to run the application. Such file will be provided as example: main/resources/application.properties
+The reason behind this is the ease in configuring the application and to run it without code changes
+and another application version released. Just modify application.properties file and restart the app.
+	- observer design pattern: There were two places where I found reasonable to use this design approach,
+as the message processing is an asynchronous process and different layers weren't able to know about
+message completeness without listening to a complete event.
+	- abstract class Message - will have the complete() method along with an MessageCompleteObserver
+observer (in this POC this will be the Scheduler itself, which will be registered when a new message
+is received by the scheduler. The role of this observer, is to listen the gateway when a message completes.
+It will actually call the complete() method and will schedule the next message from the priority queue.
+	- GatewayImplementation class - passes the message to resources to be processed and listenes resources
+to check when a message completes to notify the scheduler that the another message can be send.
+	- MessagePriorityQueue - which is a wrapper over ConcurrentLinkedQueue class that has a custom priority
+algorithm as described below. When a new message is received for processing, it will be added to this queue under
+it's own group. Based on the order groups are receives a priority is established as described in the document.
+When a resource is set free, a message from the group with the highest priority will be send until the group message
+list is empty. At this stage the process is be repeated with next group with the highest priority and so on.
+	- the solution follows basic SOLID principles as well as basic application structure architecture.
+	
+1. First of all I have created dummy classes that communicates between them as the current
+implementation is.
+2. I have added EntryPoint which contains the main class that loads application.properties file and sends 
+some messages to be processed.
+3. Implemented a ResourceWorker thread that mimics a resource behaviour: main puts on sleep the "resource"
+for a couple of random seconds. Whenever a new message needs to be sent to 3rd party resource, specificaly
+to a new ResourceWorker thread, the GatewayImplementation will register itself as a listener to the newly
+created thread. When the thread completes, Gateway is notified, and it will notify the scheduler to send another
+message to just freed resource.
+4. Scheduler class sends message to gateway which passes them on "resources". Whenever a resource is set free, update(Message msg)
+method is called to schedule next message.
+5. I have used log4j for logging the main events of the application. LogCode constants class contains the messages
+that are logged in different situations.
