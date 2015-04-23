@@ -1,11 +1,11 @@
 package ro.imanolie.scheduler;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import ro.imanolie.scheduler.domain.Message;
 import ro.imanolie.scheduler.domain.SimpleMessage;
 import ro.imanolie.scheduler.interceptor.MessagePriorityQueue;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author imanolie on 4/22/2015.
