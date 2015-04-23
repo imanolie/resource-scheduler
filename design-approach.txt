@@ -8,6 +8,7 @@ that maven provides.
 to run the application. Such file will be provided as example: main/resources/application.properties
 The reason behind this is the ease in configuring the application and to run it without code changes
 and another application version released. Just modify application.properties file and restart the app.
+Eg: no of resources that can processe messages and log file location
 	- observer design pattern: There were two places where I found reasonable to use this design approach,
 as the message processing is an asynchronous process and different layers weren't able to know about
 message completeness without listening to a complete event.
